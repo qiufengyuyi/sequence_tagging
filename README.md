@@ -56,5 +56,5 @@ bash run_pred.sh
 
 ## 实验结果部分汇总：
 
-![1580658611681](result_stats.png)
+![result_stats.png](result_stats.png)
 

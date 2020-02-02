@@ -56,18 +56,5 @@ bash run_pred.sh
 
 ## 实验结果部分汇总：
 
-$$
-\begin{array}[b] {|c|c|} 
-\hline method & f1-micro-avg\\ 
-\hline bilstm+crf_{baseline} & 0.8702 \\ 
-\hline bilstm+crf+wordemb  & 0.8783 \\ 
-\hline bilstm+cnn+crf+wordemb&0.8818\\ 
-\hline bert+celoss & 0.9333\\
- \hline bert+bilstm+crf & 0.9387 \\
-\hline bert+diceloss & 0.9354 \\
-\hline bert+mrc+celoss & 0.9550 \\
-\hline bert+mrc+focalloss &0.9580 \\
-\hline
-\end{array}\\
-$$
+![1580658611681](result_stats.png)
 

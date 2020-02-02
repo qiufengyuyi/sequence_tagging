@@ -6,7 +6,7 @@ bert_config = {
     'vocab_file':"vocab.txt",
     'slot_list_root_path':os.path.join('data','slot_pattern'),
     'slot_file_name':"tmp_slot_list",
-    'bert_slot_file_name':"bert_slot_pattern",
+    'bert_slot_file_name':"bert_basic_slot_list",
     'bert_slot_complete_file_name':"bert_complete_slot_pattern",
     'log_dir': os.path.join('output','log'),
     'data_file_name':'orig_data_train.txt',

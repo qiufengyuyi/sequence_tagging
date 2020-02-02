@@ -19,8 +19,9 @@ import unicodedata
 import six
 import codecs
 import tensorflow as tf
+import re
 from data_processing.data_utils import read_slots
-
+from data_processing.data_utils import seg
 
 def convert_to_unicode(text):
     """Converts `text` to Unicode (if it's not already), assuming utf-8 input."""
@@ -129,10 +130,31 @@ class CustomTokenizer(object):
         return convert_tokens_to_ids(self.vocab, tokens)
 
     def convert_slot_to_ids(self, tokens):
+        print(self.slot2id)
         return convert_tokens_to_ids(self.slot2id, tokens,"O")
 
 
+class WordTokenizer(object):
+    def __init__(self):
+        self.vocab = {}
+        self.count = 1
 
+    def seg(self,text):
+        word_ids_list = []
+        text = re.sub(r" ","",text)
+        text_split = seg(text)
+        for word in text_split:
+            if word in self.vocab:
+                word_ids_list.append(self.vocab.get(word))
+            else:
+                self.count += 1
+                self.vocab[word] = self.count
+                word_ids_list.append(self.count)
+        return word_ids_list,text_split
+
+    # def seg_text_list(self,texts):
+    #     result_list = [self.seg(text) for text in texts]
+    #     return result_list
 
 class FullTokenizer(object):
     """Runs end-to-end tokenziation."""

@@ -1,0 +1,1 @@
+python load_and_predict.py --model_type bert --prediction_result_path prediction_result_completelabel_bert_nocrf_dlloss.npy --model_pb_dir bert_mrc_focal_loss_model_pb

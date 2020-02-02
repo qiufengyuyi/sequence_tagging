@@ -2,11 +2,11 @@ import tensorflow as tf
 import numpy as np
 import common_utils
 import optimization
-from tf_metrics import precision, recall, f1
+from models.tf_metrics import precision, recall, f1
 from models.utils import dice_dsc_loss
 from models.layers.lstm_crf_layers import BLSTM_CRF
 from models.layers.lstm_layers import BLSTM
-from models.layers.crf_layer import CRF
+from models.layers.crf_layers import CRF
 
 
 

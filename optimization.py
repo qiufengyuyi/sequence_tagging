@@ -26,6 +26,8 @@ def create_optimizer(loss, init_lr, num_train_steps,clip_norm):
   """Creates an optimizer training op."""
   global_step = tf.train.get_or_create_global_step()
 
+
+
   learning_rate = tf.constant(value=init_lr, shape=[], dtype=tf.float32)
 
   # Implements linear decay of the learning rate.
@@ -58,7 +60,7 @@ def create_optimizer(loss, init_lr, num_train_steps,clip_norm):
   # loaded from init_checkpoint.)
   optimizer = AdamWeightDecayOptimizer(
       learning_rate=learning_rate,
-      weight_decay_rate=0.01,
+      weight_decay_rate=0.001,
       beta_1=0.9,
       beta_2=0.999,
       epsilon=1e-6,

@@ -56,5 +56,14 @@ bash run_pred.sh
 
 ## 实验结果部分汇总：
 
-![result_stats.png](result_stats.png)
+|         method          | f1-micro-avg |
+| :---------------------: | :----------: |
+| bilstm+$crf_{baseline}$ |    0.8702    |
+|   bilstm+crf+wordemb    |    0.8783    |
+| bilstm+cnn+crf+wordemb  |    0.8818    |
+|       bert+celoss       |    0.9333    |
+|     bert+bilstm+crf     |    0.9387    |
+|      bert+diceloss      |    0.9354    |
+|     bert+mrc+celoss     |    0.9550    |
+|   bert+mrc+focalloss    |    0.9580    |
 

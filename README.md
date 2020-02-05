@@ -1,5 +1,13 @@
 # sequence tagging project
 
+更新update 2020.02.05:
+
+**补充了缺失的代码和脚本，同时加了一点样例数据，方便测试代码是否可以完整运行。**
+
+------
+
+
+
 依赖包：主要是tensorflow 1.12.0，其余见requirements.txt
 
 目前项目包含了传统的Bilstm-crf模型和使用了bert的模型。

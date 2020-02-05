@@ -1,0 +1,6 @@
+海 钓 比 赛 地 点 在 厦 门 与 金 门 之 间 的 海 域 。
+O O O O O O O B-LOC I-LOC O B-LOC I-LOC O O O O O O
+这 座 依 山 傍 水 的 博 物 馆 由 国 内 一 流 的 设 计 师 主 持 设 计 ， 整 个 建 筑 群 精 美 而 恢 宏 。 但 作 为 一 个 共 产 党 员 、 人 民 公 仆 ， 应 当 胸 怀 宽 阔 ， 真 正 做 到 “ 先 天 下 之 忧 而 忧 ， 后 天 下 之 乐 而 乐 ” ， 淡 化 个 人 的 名 利 得 失 和 宠 辱 悲 喜 ， 把 改 革 大 业 摆 在 首 位 ， 这 样 才 能 超 越 自 我 ， 摆 脱 世 俗 ， 有 所 作 为 。 在 发 达 国 家 ， 急 救 保 险 十 分 普 及 ， 已 成 为 社 会 保 障 体 系 的 重 要 组 成 部 分 。 日 俄 两 国 国 内 政 局 都 充 满 变 数 ， 尽 管 日 俄 关 系 目 前 是 历 史 最 佳 时 期 ， 但 其 脆 弱 性 不 言 自 明 。
+O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O B-LOC B-LOC O O O O O O O O O O O O O O B-LOC B-LOC O O O O O O O O O O O O O O O O O O O O O O
+克 马 尔 的 女 儿 让 娜 今 年 读 五 年 级 ， 她 所 在 的 班 上 有 3 0 多 名 同 学 ， 该 班 的 “ 家 委 会 ” 由 1 0 名 家 长 组 成 。
+B-PER I-PER I-PER O O O B-PER I-PER O O O O O O O O O O O O O O O O O O O O O O O O O B-ORG I-ORG I-ORG O O O O O O O O O O

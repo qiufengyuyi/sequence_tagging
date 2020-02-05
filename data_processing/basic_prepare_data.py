@@ -41,6 +41,9 @@ class BaseDataPreparing(object):
             self.word_seq_embedding = gen_char_embedding(pretrained_embedding_file,self.word_tokenizer.vocab,output_file=word_seq_embedding_file)
 
     def init_final_data_path(self,config,load_word_embedding):
+        root_path = config.get("data_dir")+"/"+config.get("train_valid_data_dir")
+        if not os.path.exists(root_path):
+            os.mkdir(root_path)
         self.train_X_path = os.path.join(config.get("data_dir"), config.get("train_valid_data_dir"), config.get("train_data_text_name"))
         self.valid_X_path = os.path.join(config.get("data_dir"),config.get("train_valid_data_dir"), config.get("valid_data_text_name"))
         self.train_Y_path = os.path.join(config.get("data_dir"),config.get("train_valid_data_dir"), config.get("train_data_tag_name"))

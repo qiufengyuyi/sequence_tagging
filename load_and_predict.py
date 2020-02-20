@@ -368,10 +368,15 @@ def cal_mertric_from_two_list(prediction_list,true_list):
     print("span_level rec micro_avg:{}".format(rec))
     print("span_level f1 micro_avg:{}".format(f1))
 
-def cal_span_level_micro_average(prediction_array_file,model_type,has_cls):
-    prediction_array = np.load(prediction_array_file)
-    orig_texts, orig_labels = gen_orig_test_text_label(has_cls)
-    if model_type == "bert":
+def cal_span_level_micro_average(args):
+    if not os.path.exists(args.prediction_result_path):
+        if args.model_type == "bert":
+            gen_prediction_output(True,args)
+        else:
+            gen_prediction_output(False,args)
+    prediction_array = np.load(args.prediction_result_path)
+    orig_texts, orig_labels = gen_orig_test_text_label(args.has_cls)
+    if args.model_type == "bert":
 
         fp = fastPredictionBert(bert_config.get(args.model_pb_dir), bert_config, args.label_less)
         id2slot_dict = fp.data_loader.tokenizer.id2slot
@@ -417,6 +422,34 @@ def cal_span_level_micro_average_for_bertmrc(args):
     # print(true_entity_list[0:10])
     cal_mertric_from_two_list(prediction_list, true_entity_list)
 
+def gen_prediction_output(using_bert,args):
+    if using_bert:
+        fp = fastPredictionBert(bert_config.get(args.model_pb_dir), bert_config, args.label_less)
+    else:
+        fp = fastPredict(bert_config.get(args.model_pb_dir), bert_config, args.label_less)
+        test_data_word_X = np.load(fp.data_loader.test_word_path)
+    orig_label_list = fp.get_orig_test_label()
+    orig_label_array = np.array(orig_label_list)
+    np.save("bert_true_label.npy", orig_label_array)
+    true_labels = np.load("bert_true_label.npy")
+    test_data_X = np.load(fp.data_loader.test_X_path)
+    # test_data_word_X = np.load(fp.data_loader.test_word_path)
+    # print(test_data_X)
+    prediction_list = []
+    for i, text in enumerate(test_data_X):
+        # print(text.shape)
+        # test_data_word = test_data_word_X[i]
+        if using_bert:
+            prediction_list.append(
+                fp.predict_text(text, None, orig_labels=true_labels[i], raw_test_data=False, using_bert=True,
+                                return_raw_result=True))
+        else:
+            test_data_word = test_data_word_X[i]
+            prediction_list.append(fp.predict_text(text,test_data_word,None,False,False,True))
+    prediction_array = np.array(prediction_list)
+    np.save(args.prediction_result_path, prediction_array)
+
+
 if __name__ == '__main__':
     parser = ArgumentParser()
     parser.add_argument("--prediction_result_path", default='prediction_result_baseline.npy', type=str)
@@ -428,9 +461,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
     # print(args.label_less)
     if args.model_type == "bert":
-        cal_span_level_micro_average(args.prediction_result_path,args.model_type,args.has_cls)
+        cal_span_level_micro_average(args)
     elif args.model_type == "bert_mrc":
         cal_span_level_micro_average_for_bertmrc(args)
     else:
-
-        cal_span_level_micro_average(args.prediction_result_path, args.model_type, args.has_cls)
+        cal_span_level_micro_average(args)

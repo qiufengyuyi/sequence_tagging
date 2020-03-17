@@ -80,6 +80,56 @@ def create_optimizer(loss, init_lr, num_train_steps,clip_norm):
   train_op = tf.group(train_op, [global_step.assign(new_global_step)])
   return train_op
 
+def create_optimizer_for_bertcrf(loss, init_lr, num_train_steps, clip_norm):
+    """
+    让bert层crf层使用不同的学习率来学习
+    :param loss:
+    :param init_lr:
+    :param num_train_steps:
+    :param clip_norm:
+    :return:
+    """
+    """Creates an optimizer training op."""
+    global_step = tf.train.get_or_create_global_step()
+
+    learning_rate = tf.constant(value=init_lr, shape=[], dtype=tf.float32)
+
+    optimizer = AdamWeightDecayOptimizer(
+        learning_rate=learning_rate,
+        weight_decay_rate=0.001,
+        beta_1=0.9,
+        beta_2=0.999,
+        epsilon=1e-6,
+        exclude_from_weight_decay=["LayerNorm", "layer_norm", "bias"])
+
+    optimizer_2 = AdamWeightDecayOptimizer(
+        learning_rate=learning_rate * 100,
+        weight_decay_rate=0.001,
+        beta_1=0.9,
+        beta_2=0.999,
+        epsilon=1e-6,
+        exclude_from_weight_decay=["LayerNorm", "layer_norm", "bias"])
+
+    tvars = tf.trainable_variables()
+    # grads = tf.gradients(loss, tvars)
+    tvars_no_crf = [var for var in tvars if not re.search(r"crf", var.name)]
+    tvars_crf = [var for var in tvars if re.search(r"crf", var.name)]
+    print([var.name for var in tvars_crf])
+    grads = tf.gradients(loss, tvars_no_crf + tvars_crf)
+
+    # This is how the model was pre-trained.
+    (grads, _) = tf.clip_by_global_norm(grads, clip_norm=clip_norm)
+    grads_nocrf = grads[:len(tvars_no_crf)]
+    grads_crf = grads[len(tvars_no_crf):]
+    train_op_1 = optimizer.apply_gradients(
+        zip(grads_nocrf, tvars_no_crf), global_step=global_step)
+    train_op_2 = optimizer_2.apply_gradients(
+        zip(grads_crf, tvars_crf), global_step=global_step)
+
+    new_global_step = global_step + 1
+    train_op = tf.group(train_op_1, train_op_2, [global_step.assign(new_global_step)])
+    return train_op
+
 from tensorflow.python.framework import ops
 from tensorflow.python.ops import control_flow_ops
 from tensorflow.python.ops import math_ops

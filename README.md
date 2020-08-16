@@ -1,6 +1,26 @@
 # sequence tagging project
 
-更新update 2020.02.05:
+-- **更新update 2020.08.16:** --
+
+增加了论文实现[Enhancing Pre-trained Chinese Character Representation with Word-aligned Attention](https://arxiv.org/abs/1911.02821) ，基于pytorch 1.6.0，以及huggingface的transformers 2.11.0。分词工具使用了百度的lac2.0，thulac，ltp，请自行安装这些工具。
+
+另外，我上传了已经分词好的结果，在data下面的set_orig_data_*.json中。如果想自行分词，请参考word_seg_utils.py代码。
+
+可以使用test_data_processing.py来生成数据文件。
+
+## 训练pytorch运行脚本：
+
+```shell
+bash run_torch.sh
+```
+
+reference
+
+pytorch ner框架实现参考了 https://github.com/lonePatient/BERT-NER-Pytorch ，mwa实现参考了 https://github.com/lsvih/MWA
+
+------
+
+-- **更新update 2020.02.05:** --
 
 **补充了缺失的代码和脚本，同时加了一点样例数据，方便测试代码是否可以完整运行。**
 

@@ -13,10 +13,18 @@ from data_processing.data_utils import *
 from data_processing.basic_prepare_data import BaseDataPreparing
 from data_processing.bert_prepare_data import bertPrepareData
 from data_processing.bert_mrc_prepare_data import bertMRCPrepareData
+from data_processing.bert_word_prepare_data import bertWordPrepareData
 from configs.base_config import config
 from configs.bert_config import bert_config
 from configs.bert_mrc_config import bert_mrc_config
+from configs.bert_word_config import bert_config as bert_mwa_config
 from bert import modeling
+from torch.utils.data import RandomSampler,SequentialSampler
+from torch.utils.data import DataLoader
+from transformers.modeling_bert import BertConfig
+from models.torch_mwa import BertForMWA
+from optimization import BertAdam
+from pytorch_trainer import trainer,predict_all_and_evaluate
 from sklearn.metrics import classification_report, f1_score
 from sklearn.preprocessing import MultiLabelBinarizer
 
@@ -439,3 +447,69 @@ def run_train_cnn(args):
         #         break
 
         estimator.export_saved_model(pb_model_dir, serving_input_receiver_fn)
+
+
+def run_bert_mwa_torch(args):
+    vocab_file_path = os.path.join(bert_mwa_config.get("bert_pretrained_model_path"), bert_mwa_config.get("vocab_file"))
+    bert_config_file = os.path.join(bert_mwa_config.get("bert_pretrained_model_path"),
+                                    bert_mwa_config.get("bert_config_path"))
+
+    slot_file = os.path.join(bert_mwa_config.get("slot_list_root_path"),
+                             bert_mwa_config.get("bert_slot_complete_file_name"))
+    data_loader = bertWordPrepareData(vocab_file_path, slot_file, bert_mwa_config, None, 384, None, None, False, False,
+                                      True)
+    label2id = data_loader.tokenizer.slot2id
+    train_features = data_loader.load_cache_train_dev_data()
+    train_dataset = create_dataset_for_torch(train_features)
+    train_sampler = RandomSampler(train_dataset)
+    train_dataloader = DataLoader(train_dataset, sampler=train_sampler, batch_size=args.train_batch_size)
+    valid_features = data_loader.load_cache_train_dev_data(False)
+    valid_dataset = create_dataset_for_torch(valid_features)
+    valid_sampler = SequentialSampler(valid_dataset)
+    valid_dataloader = DataLoader(valid_dataset, sampler=valid_sampler, batch_size=args.valid_batch_size)
+    model = BertForMWA
+    device = torch.device("cuda:0")
+
+    if args.do_train:
+        model = model.from_pretrained(bert_mwa_config.get("bert_pretrained_model_path"), device=device,
+                                      label2ids=label2id)
+        model = model.to(device)
+        if data_loader.train_samples_nums % args.train_batch_size != 0:
+            each_epoch_steps = int(data_loader.train_samples_nums / args.train_batch_size) + 1
+        else:
+            each_epoch_steps = int(data_loader.train_samples_nums / args.train_batch_size)
+        train_steps_nums = each_epoch_steps * args.epochs
+        param_optimizer = list(model.named_parameters())
+        param_optimizer = [n for n in param_optimizer]
+
+        no_decay = ['bias', 'LayerNorm.bias', 'LayerNorm.weight']
+        optimizer_grouped_parameters = [
+            {'params': [p for n, p in param_optimizer if not any(nd in n for nd in no_decay)],
+             'weight_decay': 0.001},
+            {'params': [p for n, p in param_optimizer if any(nd in n for nd in no_decay)], 'weight_decay': 0.0}
+        ]
+        # optimizer = AdamW(optimizer_grouped_parameters, lr=args.lr, eps=1e-6)
+        optimizer = BertAdam(optimizer_grouped_parameters, lr=args.lr, max_grad_norm=args.clip_norm, warmup=0.1,
+                             t_total=train_steps_nums)
+        # scheduler = WarmupLinearSchedule(optimizer, warmup_steps=args.warmup_steps, t_total=args.train_steps)
+        logger.info("***** Running training *****")
+        logger.info("  Num examples = %d", data_loader.train_samples_nums)
+        logger.info("  Batch size = %d", args.train_batch_size)
+        logger.info("  Num steps = %d", train_steps_nums)
+
+        trainer(model, optimizer, train_dataloader, valid_dataloader, args.epochs, train_steps_nums, each_epoch_steps,
+                data_loader.tokenizer.id2slot, device, logger, args)
+    if args.do_test:
+        test_features = data_loader.load_cache_train_dev_data(False, True)
+        test_dataset = create_dataset_for_torch(test_features)
+        test_sampler = SequentialSampler(test_dataset)
+        test_dataloader = DataLoader(test_dataset, sampler=test_sampler, batch_size=args.test_batch_size)
+        bertconfig = BertConfig.from_pretrained(bert_mwa_config.get("bert_pretrained_model_path"))
+        model = BertForMWA(bertconfig, label2id, device)
+        model.load_state_dict(
+            state_dict=torch.load(bert_mwa_config.get(args.model_checkpoint_dir) + "/pytorch_model.bin"))
+        # model = model.from_pretrained(,device=device,label2ids=label2id)
+        model.to(device)
+        predict_all_and_evaluate(model, test_dataloader, data_loader.tokenizer.id2slot, device, logger,
+                                 "data/orig_data_test.txt", args)
+

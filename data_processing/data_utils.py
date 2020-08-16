@@ -5,6 +5,8 @@ import requests
 import numpy as np
 import json
 import tensorflow as tf
+import torch
+from torch.utils.data import TensorDataset
 SEGURL=""
 
 def seg_from_api(data):
@@ -143,3 +145,20 @@ def input_bert_mrc_fn(input_Xs,start_Ys,end_Ys,token_type_ids,query_lens,is_trai
     ds = ds.prefetch(args.pre_buffer_size)
 
     return ds
+
+def create_dataset_for_torch(features):
+    all_input_ids = torch.tensor(features.get("input_ids"),dtype=torch.long)
+    all_input_mask = torch.tensor(features.get("input_mask"),dtype=torch.long)
+    all_segment_ids = torch.tensor(features.get("segment_ids"),dtype=torch.long)
+    all_label_ids = torch.tensor(features.get("label_ids"),dtype=torch.long)
+    all_input_lens = torch.tensor(features.get("input_lens"),dtype=torch.long)
+    print(type(features.get("word_seq_len_baidu")))
+    all_word_seq_lens_baidu = torch.tensor(features.get("word_seq_len_baidu"),dtype=torch.long)
+    all_word_seq_lens_thu = torch.tensor(features.get("word_seq_len_thu"),dtype=torch.long)
+    all_word_seq_lens_ltp = torch.tensor(features.get("word_seq_len_ltp"),dtype=torch.long)
+    all_word_slice_baidu = torch.tensor(features.get("word_slice_baidu"),dtype=torch.long)
+    all_word_slice_thu = torch.tensor(features.get("word_slice_thu"),dtype=torch.long)
+    all_word_slice_ltp = torch.tensor(features.get("word_slice_ltp"),dtype=torch.long)
+    dataset = TensorDataset(all_input_ids,all_word_seq_lens_baidu,all_word_seq_lens_thu,all_word_seq_lens_ltp,all_word_slice_baidu,all_word_slice_thu,all_word_slice_ltp,
+    all_segment_ids,all_input_mask,all_label_ids,all_input_lens)
+    return dataset

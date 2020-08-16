@@ -1,0 +1,1 @@
+python run_torch.py  --epochs 10 --lr 2.5e-5 --clip_norm 5.0 --train_batch_size 16 --valid_batch_size 32 --do_train --do_test --model_checkpoint_dir bert_mwa_crf_warmup_1head_dropout_torch_model_dir

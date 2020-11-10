@@ -6,7 +6,7 @@ import numpy as np
 from data_processing.tokenize import WordObj
 from data_processing.data_utils import gen_char_embedding
 from data_processing.tokenize import CustomTokenizer
-from data_processing.lstmcrf_prepare_data import BaseDataPreparing
+from data_processing.basic_prepare_data import BaseDataPreparing
 
 
 class bertWordPrepareData(BaseDataPreparing):

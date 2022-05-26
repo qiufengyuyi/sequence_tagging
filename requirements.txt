@@ -1,4 +1,4 @@
-tensorflow-gpu==1.12.0
+tensorflow-gpu==2.7.2
 gensim
 sklearn
 numpy

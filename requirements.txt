@@ -3,4 +3,4 @@ gensim
 sklearn
 numpy
 torch==1.6.0
-transformers==2.11.0
+transformers==4.30.0
